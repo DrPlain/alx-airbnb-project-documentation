@@ -232,3 +232,114 @@ Allow guests to book properties, manage booking statuses, and prevent double boo
 ### **Performance Criteria**
 - Booking validations should complete within 300ms.
 - System should handle up to 1,000 concurrent booking requests.
+
+---
+
+## 4. Searching and Filtering Functionalities
+### Objective
+Allows users to search and filter property listings based on various criteria like location, price, amenities, and more.
+
+### **Functional Requirements**
+- Users must be able to filter properties by location (city, region, or country), price range (minimum and maximum values), number of guests, and amenities (e.g., Wi-Fi, pool, air conditioning, etc.).
+- Users must be able to view results paginated if the dataset is large.
+- Filters should be combinable (e.g., users can search for properties with a specific location, price range, and amenities simultaneously).
+
+### API Endpoints
+- **GET /api/search**  
+  **Description:** Search for properties based on user inputs.  
+  **Input:**  
+  ```json
+  {
+      "location": "string",
+      "price_range": {"min": "number", "max": "number"},
+      "number_of_guests": "integer",
+      "amenities": ["string"],
+      "page": "integer",
+      "limit": "integer"
+  }
+  ```  
+  **Output:**  
+  ```json
+  {
+      "properties": [
+          {
+              "id": "string",
+              "title": "string",
+              "description": "string",
+              "price": "number",
+              "location": "string",
+              "amenities": ["string"]
+          }
+      ],
+      "pagination": {
+          "current_page": "integer",
+          "total_pages": "integer"
+      }
+  }
+  ```
+
+### Validation Rules
+- Location must be a valid string.
+- Price range must include a valid minimum and maximum.
+- Page and limit must be positive integers.
+
+### Performance Criteria
+- Results should load within 2 seconds for up to 100,000 properties.
+
+---
+
+## 5. Payment Integration
+### Objective
+Handles payments for bookings, including guest payments and payouts to hosts.
+
+### **Functional Requirements**
+- Guests must be able to make payments for bookings using supported payment methods such as credit cards, debit cards, and PayPal.
+- Hosts should receive automated payouts after guest check-in, based on the agreed amount.
+- The system must handle multiple currencies and currency conversion for international users.
+- Payments must be securely processed using encryption and tokenization.
+
+### API Endpoints
+- **POST /api/payments/initiate**  
+  **Description:** Initiates a payment for a booking.  
+  **Input:**  
+  ```json
+  {
+      "booking_id": "string",
+      "payment_method": "string",
+      "amount": "number",
+      "currency": "string"
+  }
+  ```  
+  **Output:**  
+  ```json
+  {
+      "payment_id": "string",
+      "status": "pending",
+      "redirect_url": "string"
+  }
+  ```
+
+- **POST /api/payments/confirm**  
+  **Description:** Confirms the payment once the transaction is successful.  
+  **Input:**  
+  ```json
+  {
+      "payment_id": "string",
+      "status": "string"
+  }
+  ```  
+  **Output:**  
+  ```json
+  {
+      "message": "string"
+  }
+  ```
+
+### Validation Rules
+- Amount must be greater than 0.
+- Booking ID must exist in the system.
+
+### Performance Criteria
+- Payment initiation and confirmation should take less than 1 second.
+
+---
